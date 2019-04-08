@@ -38,14 +38,24 @@ function handleActivitySelection() {
         const isChecked = $changedEvent.prop('checked');
         const $conflictingEvents = $events9To12.is($changedEvent) ? $events9To12 : $events1To4;
 
-        isChecked ? disableConflictingEvents($changedEvent, $conflictingEvents) : $conflictingEvents.prop("disabled", false);
+        if(isChecked && $changedEvent.attr('name') !== 'all') {
+            disableConflictingEvents($changedEvent, $conflictingEvents)
+        }else {
+            $conflictingEvents.prop("disabled", false);
+            $conflictingEvents.parent().css('color','#000')
+        }
     }
 }
 
 function disableConflictingEvents($selectedEvent, $disableConflictingEvents) {
     $disableConflictingEvents.map((eventIndex) => {
         const $activity = $($disableConflictingEvents[eventIndex]);
-        $activity.is($selectedEvent) ? $activity.prop("disabled", false) : $activity.prop('disabled', true);
+        if (!$activity.is($selectedEvent)){
+            $activity.prop('disabled', true);
+            $activity.parent().css({color: "#A9A9A9"});
+        } else {
+            $activity.prop("disabled", false);
+        }  
     })
 }
 
