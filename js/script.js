@@ -2,8 +2,10 @@
 $(window).on('DOMContentLoaded', inititaliseForm);
 
 function inititaliseForm() {
+
     $('#other-title').hide();
-    $('#design').on('change', showColorOptionsForDesign);
+    $('#design').on('input', showColorOptionsForDesign);
+    $('.activities').on('input', 'input', handleActivitySelection());
 }
 
 function showColorOptionsForDesign(event) {
@@ -26,6 +28,25 @@ function showAndHideOptions($optionsToShow, $optionstoHide) {
     $optionstoHide.hide();
     $optionsToShow.show();
     $($optionsToShow["0"]).prop('selected', true);
+}
+
+function handleActivitySelection() {
+    const $events9To12 = $("input[name = 'js-frameworks'], input[name = 'express'], input[name = 'build-tools']");
+    const $events1To4 = $("input[name = 'js-libs'], input[name = 'node'], input[name = 'npm']");
+    return function (event) {
+        const $changedEvent = $(event.target);
+        const isChecked = $changedEvent.prop('checked');
+        const $conflictingEvents = $events9To12.is($changedEvent) ? $events9To12 : $events1To4;
+
+        isChecked ? disableConflictingEvents($changedEvent, $conflictingEvents) : $conflictingEvents.prop("disabled", false);
+    }
+}
+
+function disableConflictingEvents($selectedEvent, $disableConflictingEvents) {
+    $disableConflictingEvents.map((eventIndex) => {
+        const $activity = $($disableConflictingEvents[eventIndex]);
+        $activity.is($selectedEvent) ? $activity.prop("disabled", false) : $activity.prop('disabled', true);
+    })
 }
 
 
