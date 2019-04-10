@@ -3,10 +3,12 @@ $(window).on('DOMContentLoaded', inititaliseForm);
 
 function inititaliseForm() {
 
-    $('#other-title, #colors-js-puns').hide();
+    $('#name').focus();
+    $('#other-title, label[for = "other-title"], #colors-js-puns').hide();
     $('#design').on('input', showColorOptionsForDesign);
     $('.activities').on('input', 'input', handleActivitySelection());
     $('#payment').on('input', handlePaymentSelection());
+    $('#title').on('input', handleJobSelection);
     initialiseValidations();
 }
 
@@ -156,7 +158,7 @@ function initialiseValidations() {
 }
 
 function initialiseNameValidation() {
-    $('#name').on('focus input', (event) => validateName($(event.target)));
+    $('#name').on('click input', (event) => validateName($(event.target)));
     $('#name').on('focusout', (event) => {
         hideValidationMessages($(event.target), $('#name-validation'));
     });
@@ -302,6 +304,16 @@ function validateAll(event) {
 
     if (!(validActivity && validName && validEmail && validCard)){
         event.preventDefault();
+    }
+}
+
+function handleJobSelection (event){
+    $titleContainer = $(event.target); 
+    selectedTitle = $titleContainer.val();
+    if(selectedTitle === 'other'){
+        $('#other-title, label[for = "other-title"').show();
+    }else{
+        $('#other-title, label[for = "other-title"').hide();
     }
 }
 
