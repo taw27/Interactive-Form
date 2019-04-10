@@ -146,12 +146,12 @@ function createValidationContainerAndHide(targetSelector, validationId, message)
 function initialiseValidations () {
     initialiseValidationContainers();
 
-    $('#name').on('mouseover input', handleNameValidation);
+    $('#name').on('mouseover input', (event) => handleNameValidation($(event.target)));
     $('#name').on('mouseout focusout', (event) => {
        hideValidationMessages($(event.target),$('#name-validation'));
     });
 
-    $('#mail').on('mouseover input', handleEmailValidation);
+    $('#mail').on('mouseover input', (event) => handleEmailValidation($(event.target)));
     $('#mail').on('mouseout focusout', (event) => {
        hideValidationMessages($(event.target),$('#mail-validation'));
     });
@@ -168,34 +168,37 @@ function createCreditValidationContainerAndHide(){
     $(`#card-validation li`).hide();
 }
 
-function handleNameValidation(event){
-    $nameConatiner = $(event.target);
-    displayValidationResultStyle($nameConatiner, $('#name-validation'), $nameConatiner.val().trim() === '');
+function handleNameValidation($nameConatiner){
+    const validName =  $nameConatiner.val().trim() !== '';
+    displayValidationResultStyle($nameConatiner, $('#name-validation'), validName);
+
+    return validName;
 }
 
 // regex from https://www.w3resource.com/javascript/form/email-validation.php
-function handleEmailValidation(event){
-    $emailConatiner = $(event.target);
+function handleEmailValidation($emailConatiner){
     const emailEntered = $emailConatiner.val();
     const validatorRegex =  /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
-    const inValidEmail = ! validatorRegex.test(emailEntered);
+    const validEmail = validatorRegex.test(emailEntered);
     
-    displayValidationResultStyle($emailConatiner, $('#mail-validation'), inValidEmail);
+    displayValidationResultStyle($emailConatiner, $('#mail-validation'), validEmail);
+
+    return validEmail;
 }
 
 // Stle visuals inspiration https://ireade.github.io/form-validation-realtime/
-function displayValidationResultStyle($validationTarget, $validationMessageContainer, validationFailed){
+function displayValidationResultStyle($validationTarget, $validationMessageContainer, validationPassed){
     $validationMessageContainer.show();
 
-    if(validationFailed){
-        $validationMessageContainer.css('color', '#F61C1C');
-        if ($validationTarget.className !== 'activities'){
-            $validationTarget.css('border-color', '#FD5858');
-        }
-    } else {
+    if(validationPassed){
         $validationMessageContainer.css('color', '#7FFF00');
         if ($validationTarget.className !== 'activities'){
             $validationTarget.css('border-color', '#2ecc71');
+        }
+    } else {
+        $validationMessageContainer.css('color', '#F61C1C');
+        if ($validationTarget.className !== 'activities'){
+            $validationTarget.css('border-color', '#FD5858');
         }
     }
 }
