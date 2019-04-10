@@ -3,7 +3,7 @@ $(window).on('DOMContentLoaded', inititaliseForm);
 
 function inititaliseForm() {
 
-    $('#other-title').hide();
+    $('#other-title, #colors-js-puns').hide();
     $('#design').on('input', showColorOptionsForDesign);
     $('.activities').on('input', 'input', handleActivitySelection());
     $('#payment').on('input', handlePaymentSelection());
@@ -14,15 +14,18 @@ function showColorOptionsForDesign(event) {
     const designSelected = $(event.target).val();
     const $heartJsColorOptions = $("option[value = 'tomato'], option[value = 'steelblue'], option[value = 'dimgrey']");
     const $jsPunColorOptions = $("option[value = 'cornflowerblue'], option[value = 'darkslategrey'], option[value = 'gold']");
-
+    const $colorDropDown = $('#colors-js-puns');
     if (designSelected === "js puns") {
         showAndHideOptions($jsPunColorOptions, $heartJsColorOptions);
+        $colorDropDown.fadeIn(500);
     } else if (designSelected === "heart js") {
         showAndHideOptions($heartJsColorOptions, $jsPunColorOptions);
+        $colorDropDown.fadeIn(500);
     } else {
         $heartJsColorOptions.show();
         $jsPunColorOptions.show();
         $($jsPunColorOptions["0"]).prop('selected', true);
+        $colorDropDown.fadeOut(500);
     }
 }
 
@@ -149,17 +152,18 @@ function initialiseValidations() {
     initialiseEmailValidation();
     initialiseCardValidation();
     initialiseActivityValidation();
+    $('form').submit( validateAll);
 }
 
 function initialiseNameValidation() {
-    $('#name').on('mouseover input', (event) => handleNameValidation($(event.target)));
+    $('#name').on('mouseover input', (event) => validateName($(event.target)));
     $('#name').on('mouseout focusout', (event) => {
         hideValidationMessages($(event.target), $('#name-validation'));
     });
 }
 
 function initialiseEmailValidation() {
-    $('#mail').on('mouseover input', (event) => handleEmailValidation($(event.target)));
+    $('#mail').on('mouseover input', (event) => validateEmail($(event.target)));
     $('#mail').on('mouseout focusout', (event) => {
         hideValidationMessages($(event.target), $('#mail-validation'));
     });
@@ -202,7 +206,7 @@ function createCreditValidationContainerAndHide() {
     $(`#card-validation li`).hide();
 }
 
-function handleNameValidation($nameConatiner) {
+function validateName($nameConatiner) {
     const validName = $nameConatiner.val().trim() !== '';
     displayValidationResultStyle($nameConatiner, $('#name-validation'), validName);
 
@@ -210,7 +214,7 @@ function handleNameValidation($nameConatiner) {
 }
 
 // regex from https://www.w3resource.com/javascript/form/email-validation.php
-function handleEmailValidation($emailConatiner) {
+function validateEmail($emailConatiner) {
     const emailEntered = $emailConatiner.val();
     const validatorRegex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
     const validEmail = validatorRegex.test(emailEntered);
@@ -283,6 +287,15 @@ function validateActivitySelection($activitiesContainer){
     return activitySelectionValid;
 }
 
+function validateAll(event){
+    event.preventDefault();
+    validateActivitySelection($('.activities'));
+    validateName($('#name'));
+    validateEmail($('#mail'));
+    validateCardNumber($('#cc-num'));
+    validateCvvNumber($('#cvv'));
+    validateZipdNumber($('#zip'));
+}
 
 
 
