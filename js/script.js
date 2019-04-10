@@ -145,15 +145,34 @@ function createValidationContainerAndHide(targetSelector, validationId, message)
 
 function initialiseValidations () {
     initialiseValidationContainers();
+    initialiseNameValidation();
+    initialiseEmailValidation();
+    initialiseCardValidation();
+}
 
+function initialiseNameValidation(){
     $('#name').on('mouseover input', (event) => handleNameValidation($(event.target)));
     $('#name').on('mouseout focusout', (event) => {
        hideValidationMessages($(event.target),$('#name-validation'));
     });
+}
 
+function initialiseEmailValidation(){
     $('#mail').on('mouseover input', (event) => handleEmailValidation($(event.target)));
     $('#mail').on('mouseout focusout', (event) => {
        hideValidationMessages($(event.target),$('#mail-validation'));
+    });
+}
+
+function initialiseCardValidation(){
+    $('#cc-num, #zip, #cvv').on('input focus', (event) => {
+        validateCardNumber($('#cc-num'));
+        validateCvvNumber($('#cvv'));
+        validateZipdNumber($('#zip'));
+    });
+
+    $('#cc-num, #zip, #cvv').on('focusout', (event) => {
+       hideValidationMessages($('#cc-num, #zip, #cvv'),$('#cc-num-validation, #zip-validation, #cvv-validation'));
     });
 }
 
@@ -186,7 +205,7 @@ function handleEmailValidation($emailConatiner){
     return validEmail;
 }
 
-// Stle visuals inspiration https://ireade.github.io/form-validation-realtime/
+// Style visuals inspiration https://ireade.github.io/form-validation-realtime/
 function displayValidationResultStyle($validationTarget, $validationMessageContainer, validationPassed){
     $validationMessageContainer.show();
 
@@ -210,6 +229,38 @@ function hideValidationMessages($validationTarget, $validationMessageContainer){
         $validationTarget.css('border-color', '#5e97b0');
     }
 }
+
+function validateCardNumber($numberContainer){
+    const numberEntered = $numberContainer.val();
+    const validatorRegex =  /^\d{13,16}$/;
+    const validNumber = validatorRegex.test(numberEntered);
+    
+    displayValidationResultStyle($numberContainer, $('#cc-num-validation'), validNumber);
+
+    return validNumber;
+}
+
+function validateZipdNumber($numberContainer){
+    const numberEntered = $numberContainer.val();
+    const validatorRegex =  /^\d{5}$/;
+    const validNumber = validatorRegex.test(numberEntered);
+    
+    displayValidationResultStyle($numberContainer, $('#zip-validation'), validNumber);
+
+    return validNumber;
+}
+
+function validateCvvNumber($numberContainer){
+    const numberEntered = $numberContainer.val();
+    const validatorRegex =  /^\d{3}$/;
+    const validNumber = validatorRegex.test(numberEntered);
+    
+    displayValidationResultStyle($numberContainer, $('#cvv-validation'), validNumber);
+
+    return validNumber;
+}
+
+
 
 
 
