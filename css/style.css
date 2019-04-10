@@ -149,6 +149,10 @@ button:hover {
   clear: both;
 }
 
+li.validation {
+	list-style-type: circle;
+}
+
 /* ================================= 
   Media Queries
 ==================================== */
