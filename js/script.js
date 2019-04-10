@@ -152,19 +152,19 @@ function initialiseValidations() {
     initialiseEmailValidation();
     initialiseCardValidation();
     initialiseActivityValidation();
-    $('form').submit( validateAll);
+    $('form').submit(validateAll);
 }
 
 function initialiseNameValidation() {
-    $('#name').on('mouseover input', (event) => validateName($(event.target)));
-    $('#name').on('mouseout focusout', (event) => {
+    $('#name').on('focus input', (event) => validateName($(event.target)));
+    $('#name').on('focusout', (event) => {
         hideValidationMessages($(event.target), $('#name-validation'));
     });
 }
 
 function initialiseEmailValidation() {
-    $('#mail').on('mouseover input', (event) => validateEmail($(event.target)));
-    $('#mail').on('mouseout focusout', (event) => {
+    $('#mail').on('input focus', (event) => validateEmail($(event.target)));
+    $('#mail').on('focusout', (event) => {
         hideValidationMessages($(event.target), $('#mail-validation'));
     });
 }
@@ -181,7 +181,7 @@ function initialiseCardValidation() {
     });
 }
 
-function initialiseActivityValidation(){
+function initialiseActivityValidation() {
     $('.activities').on('input', 'input', (event) => {
         validateActivitySelection($('.activities'));
     });
@@ -279,7 +279,7 @@ function validateCvvNumber($numberContainer) {
     return validNumber;
 }
 
-function validateActivitySelection($activitiesContainer){
+function validateActivitySelection($activitiesContainer) {
     const activitySelectionValid = $activitiesContainer.find('input:checked').length > 0;
 
     displayValidationResultStyle($activitiesContainer, $('#activity-validation'), activitySelectionValid);
@@ -287,14 +287,22 @@ function validateActivitySelection($activitiesContainer){
     return activitySelectionValid;
 }
 
-function validateAll(event){
-    event.preventDefault();
-    validateActivitySelection($('.activities'));
-    validateName($('#name'));
-    validateEmail($('#mail'));
-    validateCardNumber($('#cc-num'));
-    validateCvvNumber($('#cvv'));
-    validateZipdNumber($('#zip'));
+function validateAll(event) {
+    const validActivity = validateActivitySelection($('.activities'));
+    const validName = validateName($('#name'));
+    const validEmail = validateEmail($('#mail'));
+    let validCard = true;
+
+    if ($('#payment').val() === 'credit card' ) {
+        const validCardNumber = validateCardNumber($('#cc-num'));
+        const validCardZip = validateZipdNumber($('#zip'))
+        const validCardCvv = validateCvvNumber($('#cvv'));
+        validCard = validCardNumber && validCardCvv && validateZipdNumber;
+    }
+
+    if (!(validActivity && validName && validEmail && validCard)){
+        event.preventDefault();
+    }
 }
 
 
