@@ -93,37 +93,37 @@ function runTotalAnimation(total, $textSpan, $container) {
         $container.slideUp(500);
     } else {
         $textSpan.fadeIn(600);
-        $container.slideDown(500);  
+        $container.slideDown(500);
     }
 }
 
-function handlePaymentSelection(){
+function handlePaymentSelection() {
     const $paymentOptions = $('#payment');
     const $creditCard = $('#credit-card');
     const $otherPayments = $creditCard.siblings('div');
-   
+
     setDefaultPaymentMethod($paymentOptions, $creditCard, $otherPayments);
 
-    return function (event){
+    return function (event) {
         paymentSelection = $(event.target).val();
         displaySelectedPaymentMethod(paymentSelection, $creditCard, $otherPayments);
     }
 }
 
-function setDefaultPaymentMethod($options, $creditCard, $otherPayments){
+function setDefaultPaymentMethod($options, $creditCard, $otherPayments) {
     $options.find("option[value = 'credit card']").prop('selected', true);
     $options.find("option[value = 'select_method']").hide();
     $creditCard.show();
     $otherPayments.hide()
 }
 
-function displaySelectedPaymentMethod(selectedOption, $creditCard, $otherPayments){
-    if(selectedOption === 'credit card'){
+function displaySelectedPaymentMethod(selectedOption, $creditCard, $otherPayments) {
+    if (selectedOption === 'credit card') {
         $creditCard.slideDown()
         $otherPayments.slideUp();
     } else {
         $creditCard.slideUp();
-        
+
         $otherPayments.map((index) => {
             const chosenPayment = new RegExp(`${selectedOption}`, "i").test($($otherPayments[index]).find('p').text());
             chosenPayment ? $($otherPayments[index]).slideDown() : $($otherPayments[index]).slideUp();
@@ -131,40 +131,41 @@ function displaySelectedPaymentMethod(selectedOption, $creditCard, $otherPayment
     }
 }
 
-function initialiseValidationContainers(){
+function initialiseValidationContainers() {
     createValidationContainerAndHide('#name', 'name-validation', "Name must be filled");
-    createValidationContainerAndHide('#mail', 'mail-validation', "Email must be valid" );
+    createValidationContainerAndHide('#mail', 'mail-validation', "Email must be valid");
     createValidationContainerAndHide('.activities', 'activity-validation', "At least one activity must be selected");
     createCreditValidationContainerAndHide();
 }
 
-function createValidationContainerAndHide(targetSelector, validationId, message){
+function createValidationContainerAndHide(targetSelector, validationId, message) {
     $(targetSelector).after(`<ol><li id = "${validationId}" class = "validation">${message}</li></ol>`);
     $(`#${validationId}`).hide();
 }
 
-function initialiseValidations () {
+function initialiseValidations() {
     initialiseValidationContainers();
     initialiseNameValidation();
     initialiseEmailValidation();
     initialiseCardValidation();
+    initialiseActivityValidation();
 }
 
-function initialiseNameValidation(){
+function initialiseNameValidation() {
     $('#name').on('mouseover input', (event) => handleNameValidation($(event.target)));
     $('#name').on('mouseout focusout', (event) => {
-       hideValidationMessages($(event.target),$('#name-validation'));
+        hideValidationMessages($(event.target), $('#name-validation'));
     });
 }
 
-function initialiseEmailValidation(){
+function initialiseEmailValidation() {
     $('#mail').on('mouseover input', (event) => handleEmailValidation($(event.target)));
     $('#mail').on('mouseout focusout', (event) => {
-       hideValidationMessages($(event.target),$('#mail-validation'));
+        hideValidationMessages($(event.target), $('#mail-validation'));
     });
 }
 
-function initialiseCardValidation(){
+function initialiseCardValidation() {
     $('#cc-num, #zip, #cvv').on('input focus', (event) => {
         validateCardNumber($('#cc-num'));
         validateCvvNumber($('#cvv'));
@@ -172,95 +173,115 @@ function initialiseCardValidation(){
     });
 
     $('#cc-num, #zip, #cvv').on('focusout', (event) => {
-       hideValidationMessages($('#cc-num, #zip, #cvv'),$('#cc-num-validation, #zip-validation, #cvv-validation'));
+        hideValidationMessages($('#cc-num, #zip, #cvv'), $('#cc-num-validation, #zip-validation, #cvv-validation'));
     });
 }
 
-function createCreditValidationContainerAndHide(){
+function initialiseActivityValidation(){
+    $('.activities').on('input', 'input', (event) => {
+        validateActivitySelection($('.activities'));
+    });
+
+    $('.activities').on('mouseover', (event) => {
+        validateActivitySelection($('.activities'));
+    });
+
+    $('.activities').on('mouseout', (event) => {
+        hideValidationMessages($('.activities'), $('#activity-validation'));
+    });
+}
+
+function createCreditValidationContainerAndHide() {
     $('#credit-card').after(
         `<ol id = "card-validation">
             <li id = "cc-num-validation" class = "validation">Credit Card field number between 13 and 16 digits</li>
             <li id = "zip-validation" class = "validation">Zip Code should be  5 digits</li>
             <li id = "cvv-validation" class = "validation">CVV should be 3 digits</li>
          </ol>`
-);
+    );
     $(`#card-validation li`).hide();
 }
 
-function handleNameValidation($nameConatiner){
-    const validName =  $nameConatiner.val().trim() !== '';
+function handleNameValidation($nameConatiner) {
+    const validName = $nameConatiner.val().trim() !== '';
     displayValidationResultStyle($nameConatiner, $('#name-validation'), validName);
 
     return validName;
 }
 
 // regex from https://www.w3resource.com/javascript/form/email-validation.php
-function handleEmailValidation($emailConatiner){
+function handleEmailValidation($emailConatiner) {
     const emailEntered = $emailConatiner.val();
-    const validatorRegex =  /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+    const validatorRegex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
     const validEmail = validatorRegex.test(emailEntered);
-    
+
     displayValidationResultStyle($emailConatiner, $('#mail-validation'), validEmail);
 
     return validEmail;
 }
 
 // Style visuals inspiration https://ireade.github.io/form-validation-realtime/
-function displayValidationResultStyle($validationTarget, $validationMessageContainer, validationPassed){
+function displayValidationResultStyle($validationTarget, $validationMessageContainer, validationPassed) {
     $validationMessageContainer.show();
 
-    if(validationPassed){
+    if (validationPassed) {
         $validationMessageContainer.css('color', '#7FFF00');
-        if ($validationTarget.className !== 'activities'){
+        if ($validationTarget.className !== 'activities') {
             $validationTarget.css('border-color', '#2ecc71');
         }
     } else {
         $validationMessageContainer.css('color', '#F61C1C');
-        if ($validationTarget.className !== 'activities'){
+        if ($validationTarget.className !== 'activities') {
             $validationTarget.css('border-color', '#FD5858');
         }
     }
 }
 
-function hideValidationMessages($validationTarget, $validationMessageContainer){
+function hideValidationMessages($validationTarget, $validationMessageContainer) {
     $validationMessageContainer.hide();
 
-    if ($validationTarget.className !== 'activities'){
+    if ($validationTarget.className !== 'activities') {
         $validationTarget.css('border-color', '#5e97b0');
     }
 }
 
-function validateCardNumber($numberContainer){
+function validateCardNumber($numberContainer) {
     const numberEntered = $numberContainer.val();
-    const validatorRegex =  /^\d{13,16}$/;
+    const validatorRegex = /^\d{13,16}$/;
     const validNumber = validatorRegex.test(numberEntered);
-    
+
     displayValidationResultStyle($numberContainer, $('#cc-num-validation'), validNumber);
 
     return validNumber;
 }
 
-function validateZipdNumber($numberContainer){
+function validateZipdNumber($numberContainer) {
     const numberEntered = $numberContainer.val();
-    const validatorRegex =  /^\d{5}$/;
+    const validatorRegex = /^\d{5}$/;
     const validNumber = validatorRegex.test(numberEntered);
-    
+
     displayValidationResultStyle($numberContainer, $('#zip-validation'), validNumber);
 
     return validNumber;
 }
 
-function validateCvvNumber($numberContainer){
+function validateCvvNumber($numberContainer) {
     const numberEntered = $numberContainer.val();
-    const validatorRegex =  /^\d{3}$/;
+    const validatorRegex = /^\d{3}$/;
     const validNumber = validatorRegex.test(numberEntered);
-    
+
     displayValidationResultStyle($numberContainer, $('#cvv-validation'), validNumber);
 
     return validNumber;
 }
 
+function validateActivitySelection($activitiesContainer){
+    const activitySelectionValid = $activitiesContainer.find('input:checked').length > 0;
 
+    displayValidationResultStyle($activitiesContainer, $('#activity-validation'), activitySelectionValid);
+
+    return activitySelectionValid;
+}
 
 
 
