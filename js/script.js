@@ -190,6 +190,11 @@ function displaySelectedPaymentMethod(
   } else {
     $creditCard.slideUp();
 
+    hideValidationMessages(
+      $("#cc-num, #zip, #cvv"),
+      $("#cc-num-validation, #zip-validation, #cvv-validation")
+    );
+
     $otherPayments.map(index => {
       const chosenPayment = new RegExp(`${selectedOption}`, "i").test(
         $($otherPayments[index])
