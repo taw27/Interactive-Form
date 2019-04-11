@@ -1,5 +1,9 @@
 $(window).on("DOMContentLoaded", inititaliseForm);
 
+/* 
+  Initialises the page by focusing on the name input, hiding the other text input and color selection, 
+  and initialises all other event handlers for selections and validation 
+ */
 function inititaliseForm() {
   $("#name").focus();
   $('#other-title, label[for = "other-title"], #colors-js-puns').hide();
@@ -10,6 +14,10 @@ function inititaliseForm() {
   initialiseValidations();
 }
 
+/* 
+  Takes in the event object for the input change event of design selection and displays the appropiate
+  color options based on the design selection
+ */
 function showColorOptionsForDesign(event) {
   const designSelected = $(event.target).val();
   const $heartJsColorOptions = $(
@@ -33,12 +41,20 @@ function showColorOptionsForDesign(event) {
   }
 }
 
+/* 
+  Takes in two jquery objects. One jquery object containing color option elements to display 
+  and another jquery object containing color option elements to hide. Displays the appropriate
+  elemts and hides the appropriate elemtns
+ */
 function showAndHideOptions($optionsToShow, $optionstoHide) {
   $optionstoHide.hide();
   $optionsToShow.show();
   $($optionsToShow["0"]).prop("selected", true);
 }
-
+/*
+  returns an event handler function to handle the logic of activity selection. Disable conflicting
+  events upon selection and displays the totals as activities are being selected
+ */
 function handleActivitySelection() {
   const $events9To12 = $(
     "input[name = 'js-frameworks'], input[name = 'express'], input[name = 'build-tools']"
@@ -71,10 +87,14 @@ function handleActivitySelection() {
   };
 }
 
-function disableConflictingEvents($selectedEvent, $disableConflictingEvents) {
-  $disableConflictingEvents.map(eventIndex => {
-    const $activity = $($disableConflictingEvents[eventIndex]);
-    if (!$activity.is($selectedEvent)) {
+/*
+  Takes in the selected activity element and a jQuery object containing conflicting activities.
+  Disables the activities conflicting the selected activity and enables the selected activity
+ */
+function disableConflictingEvents(selectedActivity, $conflictingActivities) {
+  $conflictingActivities.map(eventIndex => {
+    const $activity = $($conflictingActivities[eventIndex]);
+    if (!$activity.is(selectedActivity)) {
       $activity.prop("disabled", true);
       $activity.parent().css({ color: "#A9A9A9" });
     } else {
@@ -83,6 +103,10 @@ function disableConflictingEvents($selectedEvent, $disableConflictingEvents) {
   });
 }
 
+/* 
+  Creates the total counter container, appends it to the activities container and
+  hides the counter container
+ */
 function initialiseTotalCounter() {
   $totalContainer = $(`<div class = "Total"> Total: $ <span>0<span>  </div>`);
 
@@ -92,6 +116,12 @@ function initialiseTotalCounter() {
   return $totalContainer;
 }
 
+/* 
+  takes in a number and a jQuery object of the container as parameters.
+  Changes the number in the container by the number. Runs animation to display/hide
+  the total at the end
+
+ */
 function changeTotal(numberToChangeBy, $container) {
   let $totalSpan = $container.find("span");
   let total = parseInt($totalSpan.text());
@@ -101,6 +131,11 @@ function changeTotal(numberToChangeBy, $container) {
   runTotalAnimation(total, $totalSpan, $container);
 }
 
+/* 
+  Takes in the total, the jQuery object containing the total span and jQuery containing
+  the total container as parameters. Hides the total span and container if the total is 0
+  and shows the total if total is greater than 0 with fade and slide animations
+ */
 function runTotalAnimation(total, $textSpan, $container) {
   if (total === 0) {
     $textSpan.fadeOut();
@@ -111,6 +146,11 @@ function runTotalAnimation(total, $textSpan, $container) {
   }
 }
 
+/*
+  Set's the default payment method to credit card.
+  returns a fucntion that handles the payment selection process by displaying the payment option 
+  selected and hiding the other options
+ */
 function handlePaymentSelection() {
   const $paymentOptions = $("#payment");
   const $creditCard = $("#credit-card");
@@ -124,6 +164,11 @@ function handlePaymentSelection() {
   };
 }
 
+/* 
+  takes in the jquery objects containing the payment selection options, the credit card container and 
+  the other payment option containers. It sets the default payment option to credit card, displays
+  it, and hide the rest of the payment containers
+ */
 function setDefaultPaymentMethod($options, $creditCard, $otherPayments) {
   $options.find("option[value = 'credit card']").prop("selected", true);
   $options.find("option[value = 'select_method']").hide();
@@ -131,6 +176,9 @@ function setDefaultPaymentMethod($options, $creditCard, $otherPayments) {
   $otherPayments.hide();
 }
 
+/* 
+  Displays the payment option selected and hides the rest with slide animation
+ */
 function displaySelectedPaymentMethod(
   selectedOption,
   $creditCard,
@@ -155,6 +203,10 @@ function displaySelectedPaymentMethod(
   }
 }
 
+/* 
+  Initialises all the validation containers for name, email, activity, and credit card with 
+  validation messages and hides them after
+ */
 function initialiseValidationContainers() {
   createValidationContainerAndHide(
     "#name",
@@ -174,6 +226,11 @@ function initialiseValidationContainers() {
   createCreditValidationContainerAndHide();
 }
 
+/* 
+  Takes in the selector to select the element/container to create the validation for,
+  take's in the id for the validation container to be created and also the message to display. 
+  Creates the container and hides it
+ */
 function createValidationContainerAndHide(
   targetSelector,
   validationId,
@@ -185,6 +242,9 @@ function createValidationContainerAndHide(
   $(`#${validationId}`).hide();
 }
 
+/* 
+  Initialises the name, email, activity and credit card validation processes 
+ */
 function initialiseValidations() {
   initialiseValidationContainers();
   initialiseNameValidation();
@@ -194,6 +254,9 @@ function initialiseValidations() {
   $("form").submit(validateAll);
 }
 
+/* 
+  Initialises the name validation process 
+ */
 function initialiseNameValidation() {
   $("#name").on("click input", event => validateName($(event.target)));
   $("#name").on("focusout", event => {
@@ -201,6 +264,9 @@ function initialiseNameValidation() {
   });
 }
 
+/* 
+  Initialises the email validation process 
+ */
 function initialiseEmailValidation() {
   $("#mail").on("input focus", event => validateEmail($(event.target)));
   $("#mail").on("focusout", event => {
@@ -208,6 +274,9 @@ function initialiseEmailValidation() {
   });
 }
 
+/* 
+  Initialises the card validation process 
+ */
 function initialiseCardValidation() {
   $("#cc-num, #zip, #cvv").on("input focus", event => {
     validateCardNumber($("#cc-num"));
@@ -223,6 +292,9 @@ function initialiseCardValidation() {
   });
 }
 
+/* 
+  Initialises the activity selection validation process 
+ */
 function initialiseActivityValidation() {
   $(".activities").on("input", "input", event => {
     validateActivitySelection($(".activities"));
@@ -237,6 +309,9 @@ function initialiseActivityValidation() {
   });
 }
 
+/* 
+  Creates validation container for the credit card along with the message and hides it
+ */
 function createCreditValidationContainerAndHide() {
   $("#credit-card").after(
     `<ol id = "card-validation">
@@ -248,6 +323,10 @@ function createCreditValidationContainerAndHide() {
   $(`#card-validation li`).hide();
 }
 
+/* 
+  Takes in a jQuery object container the name input. Checks if the value is not empty, displays the validation messages
+  and returns true if it is valid
+ */
 function validateName($nameConatiner) {
   const validName = $nameConatiner.val().trim() !== "";
   displayValidationResultStyle(
@@ -258,10 +337,13 @@ function validateName($nameConatiner) {
 
   return validName;
 }
-
-// regex from https://www.w3resource.com/javascript/form/email-validation.php
+/* 
+  Takes in a jQuery object container the email input. Checks if the email is valid, displays the validation messages
+  and returns true if it is valid
+*/
 function validateEmail($emailConatiner) {
   const emailEntered = $emailConatiner.val();
+  // regex from https://www.w3resource.com/javascript/form/email-validation.php for validating emails
   const validatorRegex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
   const validEmail = validatorRegex.test(emailEntered);
 
@@ -274,7 +356,14 @@ function validateEmail($emailConatiner) {
   return validEmail;
 }
 
-// Style visuals inspiration https://ireade.github.io/form-validation-realtime/
+/* 
+  Takes in the Jquery object validation target & the validation mesage container, and a boolean
+  indicating if validsation passed. Displays the validation messages and changes the color of messages to red  
+  passed, green if not passed. If the container does not have the activity class then changes the border color to green if passed
+  and red if not passed
+
+  Style visuals inspiration https://ireade.github.io/form-validation-realtime/
+ */
 function displayValidationResultStyle(
   $validationTarget,
   $validationMessageContainer,
@@ -295,6 +384,11 @@ function displayValidationResultStyle(
   }
 }
 
+/* 
+  takes in jQuery object of the validation target and the validation message container. Hides
+  the message containers and changes the input borders to original color if it does not have the
+  activity class
+ */
 function hideValidationMessages(
   $validationTarget,
   $validationMessageContainer
@@ -306,9 +400,13 @@ function hideValidationMessages(
   }
 }
 
+/* 
+  Takes in jQuery object of the card number container. Checks if the credit number is valid, displays the validation messages
+  and returns true if it is valid
+ */
 function validateCardNumber($numberContainer) {
   const numberEntered = $numberContainer.val();
-  const validatorRegex = /^\d{13,16}$/;
+  const validatorRegex = /^\d{13,16}$/; // regex to check if the number is between 13 and 16 number
   const validNumber = validatorRegex.test(numberEntered);
 
   displayValidationResultStyle(
@@ -320,9 +418,13 @@ function validateCardNumber($numberContainer) {
   return validNumber;
 }
 
+/* 
+  Takes in jQuery object of the zip number container. Checks if the zip number is valid, displays the validation messages
+  and returns true if it is valid
+ */
 function validateZipdNumber($numberContainer) {
   const numberEntered = $numberContainer.val();
-  const validatorRegex = /^\d{5}$/;
+  const validatorRegex = /^\d{5}$/; // regex to check if number contains exactly 5 digits
   const validNumber = validatorRegex.test(numberEntered);
 
   displayValidationResultStyle(
@@ -334,9 +436,13 @@ function validateZipdNumber($numberContainer) {
   return validNumber;
 }
 
+/* 
+  Takes in jQuery object of the cvv number container. Checks if the zip number is valid, displays the validation messages
+  and returns true if it is valid
+ */
 function validateCvvNumber($numberContainer) {
   const numberEntered = $numberContainer.val();
-  const validatorRegex = /^\d{3}$/;
+  const validatorRegex = /^\d{3}$/; // regex to check is number contains exactly 3 digits
   const validNumber = validatorRegex.test(numberEntered);
 
   displayValidationResultStyle(
@@ -348,9 +454,13 @@ function validateCvvNumber($numberContainer) {
   return validNumber;
 }
 
+/* 
+  Takes in jQuery object of the activity container. Checks if the  number of activity selected is atleast one for validation, displays the validation messages
+  and returns true if it is valid
+ */
 function validateActivitySelection($activitiesContainer) {
   const activitySelectionValid =
-    $activitiesContainer.find("input:checked").length > 0;
+    $activitiesContainer.find("input:checked").length > 0; // checks if atleast one activity is selected
 
   displayValidationResultStyle(
     $activitiesContainer,
@@ -360,6 +470,11 @@ function validateActivitySelection($activitiesContainer) {
 
   return activitySelectionValid;
 }
+
+/* 
+  validates name, email, activity selection and credit card (if it is selected) at once and displays 
+  the appropriate validation messages 
+*/
 
 function validateAll(event) {
   const validActivity = validateActivitySelection($(".activities"));
@@ -379,6 +494,10 @@ function validateAll(event) {
   }
 }
 
+/* 
+  Displays the other text box if the other job option is selected and hides it if it is
+  not selected
+ */
 function handleJobSelection(event) {
   $titleContainer = $(event.target);
   selectedTitle = $titleContainer.val();
