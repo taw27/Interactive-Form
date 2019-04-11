@@ -7,7 +7,7 @@
 
 ## Description
 
-A webpage for a fictacious conference with a form for entering information for signing up for the event. The purpose of this project is making the form interactive validating the form inputs.
+A webpage for a fictacious conference with a form for entering information for signing up for the event. The purpose of this project is making the form interactive and validating the form inputs.
 
 ## Running Instructions
 
