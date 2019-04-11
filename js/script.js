@@ -507,8 +507,8 @@ function handleJobSelection(event) {
   $titleContainer = $(event.target);
   selectedTitle = $titleContainer.val();
   if (selectedTitle === "other") {
-    $('#other-title, label[for = "other-title"').show();
+    $('#other-title, label[for = "other-title"').slideDown();
   } else {
-    $('#other-title, label[for = "other-title"').hide();
+    $('#other-title, label[for = "other-title"').slideUp();
   }
 }
