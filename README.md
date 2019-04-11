@@ -1,4 +1,4 @@
-# List Pagination and Filtering (Tree house FSJS unit-03)
+# Interactive Form (Tree house FSJS unit-03)
 
 ## Table of Contents
 
@@ -7,7 +7,7 @@
 
 ## Description
 
-A webpage for a fictacious conference with a form for entering information for signing up for the event. The purpose of this project is validating the form inputs.
+A webpage for a fictacious conference with a form for entering information for signing up for the event. The purpose of this project is making the form interactive validating the form inputs.
 
 ## Running Instructions
 
