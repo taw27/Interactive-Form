@@ -1,4 +1,4 @@
-$(window).on("DOMContentLoaded", inititaliseForm);
+$(window).on("DOMContentLoaded", inititaliseForm); // initialises all the form when DOM was loaded
 
 /* 
   Initialises the page by focusing on the name input, hiding the other text input and color selection, 
