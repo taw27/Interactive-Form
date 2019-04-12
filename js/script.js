@@ -144,8 +144,11 @@ function changeTotal(numberToChangeBy, $container) {
   let total = parseInt($totalSpan.text());
 
   total += numberToChangeBy;
-  $totalSpan.text(total);
-  runTotalAnimation(total, $totalSpan, $container);
+    
+  if(!(total < 0)){
+    $totalSpan.text(total);
+    runTotalAnimation(total, $totalSpan, $container);
+  }
 }
 
 /* 
