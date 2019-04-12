@@ -242,6 +242,10 @@ function initialiseValidationContainers() {
     "Email must be valid",
     "Email entered is valid"
   );
+
+  initialiseAdditionalErrorMessage(`#mail-validation`, 'mail-validation-empty');
+
+
   createValidationContainerAndHide(
     ".activities",
     "activity-validation",
@@ -249,6 +253,16 @@ function initialiseValidationContainers() {
     "Number of activities selected is valid"
   );
   createCreditValidationContainerAndHide();
+}
+
+function initialiseAdditionalErrorMessage(messageSiblingSelector, idOfNewError){
+  $(`${messageSiblingSelector}`).after(
+    `
+    <li id = "${idOfNewError}" class = "validation">Email field cannot be blank</li>`
+  );
+
+  $(`#${idOfNewError}`).hide();
+  $(`#${idOfNewError}`).css('color',"#F61C1C");
 }
 
 /* 
@@ -376,13 +390,23 @@ function validateName(name) {
 function validateEmailAndDisplay($emailConatiner) {
   const validEmail = validateEmail($emailConatiner.val());
 
-  displayValidationResultStyle(
-    $emailConatiner,
-    $("#mail-validation"),
-    $("#mail-validation-pass"),
-    validEmail
-  );
-
+  if($emailConatiner.val().trim() === ''){
+    displayValidationResultStyle(
+      $emailConatiner,
+      $("#mail-validation-empty"),
+      $("#mail-validation-pass, #mail-validation"),
+      validEmail
+    );
+  }else{
+    $("#mail-validation-empty").hide();
+    displayValidationResultStyle(
+      $emailConatiner,
+      $("#mail-validation"),
+      $("#mail-validation-pass"),
+      validEmail
+    );
+  }
+  
   return validEmail;
 }
 
