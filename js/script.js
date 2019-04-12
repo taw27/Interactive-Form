@@ -209,8 +209,7 @@ function displaySelectedPaymentMethod(
 
     hideValidationMessages(
       $("#cc-num, #zip, #cvv"),
-      $("#cc-num-validation, #zip-validation, #cvv-validation, #cc-num-validation-pass, #zip-validation-pass, #cvv-validation-pass"),
-      true
+      $("#cc-num-validation, #zip-validation, #cvv-validation, #cc-num-validation-pass, #zip-validation-pass, #cvv-validation-pass")
     );
 
     $otherPayments.map(index => {
@@ -294,13 +293,6 @@ function initialiseNameValidation() {
   $("#name").on("click input", event =>
     validateNameAndDisplay($(event.target))
   );
-  $("#name").on("focusout", event => {
-    hideValidationMessages(
-      $(event.target),
-      $("#name-validation, #name-validation-pass"),
-      validateName($(event.target).val())
-    );
-  });
 }
 
 /* 
@@ -310,13 +302,6 @@ function initialiseEmailValidation() {
   $("#mail").on("input focus", event =>
     validateEmailAndDisplay($(event.target))
   );
-  $("#mail").on("focusout", event => {
-    hideValidationMessages(
-      $(event.target),
-      $("#mail-validation, #mail-validation-pass"),
-      validateEmail($(event.target).val())
-    );
-  });
 }
 
 /* 
@@ -329,16 +314,6 @@ function initialiseCardValidation() {
     validateZipNumberAndDisplay($("#zip"));
   });
 
-  $("#cc-num, #zip, #cvv").on("focusout", event => {
-    hideValidationMessages(
-      $("#cc-num, #zip, #cvv"),
-      $(
-        "#cc-num-validation, #zip-validation, #cvv-validation, #cc-num-validation-pass, #zip-validation-pass, #cvv-validation-pass"),
-        validateCardNumber($("#cc-num").val()) &&
-          validateCvvNumber($("#cvv").val()) &&
-          validateCvvNumber($("#zip").val())
-      );
-  });
 }
 
 /* 
@@ -347,18 +322,6 @@ function initialiseCardValidation() {
 function initialiseActivityValidation() {
   $(".activities").on("input", "input", event => {
     validateActivitySelectionAndDisplay($(".activities"));
-  });
-
-  $(".activities").on("mouseover", event => {
-    validateActivitySelectionAndDisplay($(".activities"));
-  });
-
-  $(".activities").on("mouseout", event => {
-    hideValidationMessages(
-      $(".activities"),
-      $("#activity-validation, #activity-validation-pass"),
-      validateActivitySelection($(".activities"))
-    );
   });
 }
 
@@ -471,14 +434,11 @@ function displayValidationResultStyle(
  */
 function hideValidationMessages(
   $validationTarget,
-  $validationMessageContainer,
-  validationPassed
+  $validationMessageContainer
 ) {
-  if (validationPassed) {
-    $validationMessageContainer.hide();
-    if ($validationTarget.className !== "activities") {
-      $validationTarget.css("border-color", "#5e97b0");
-    }
+  $validationMessageContainer.hide();
+  if ($validationTarget.className !== "activities") {
+    $validationTarget.css("border-color", "#5e97b0");
   }
 }
 
