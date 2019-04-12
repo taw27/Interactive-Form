@@ -58,7 +58,7 @@ function showAndHideOptions($optionsToShow, $optionstoHide) {
  */
 function handleActivitySelection() {
   const $totalContainer = initialiseTotalCounter();
-  return function (event) {
+  return function(event) {
     const $changedActivity = $(event.target);
     const isChecked = $changedActivity.prop("checked");
     const $conflictingActivities = getConflictingEvents($changedActivity);
@@ -71,7 +71,6 @@ function handleActivitySelection() {
         changeTotal(200, $totalContainer);
       }
     } else {
-
       if (!jQuery.isEmptyObject($conflictingActivities)) {
         $conflictingActivities.prop("disabled", false);
         $conflictingActivities.parent().css("color", "#000");
@@ -93,9 +92,7 @@ function getConflictingEvents($changedActivity) {
   const $events9To12 = $(
     "input[name = 'js-frameworks'], input[name = 'express']"
   );
-  const $events1To4 = $(
-    "input[name = 'js-libs'], input[name = 'node']"
-  );
+  const $events1To4 = $("input[name = 'js-libs'], input[name = 'node']");
 
   if ($events9To12.is($changedActivity)) {
     $conflictingActivities = $events9To12;
@@ -105,13 +102,11 @@ function getConflictingEvents($changedActivity) {
 
   return $conflictingActivities;
 }
-;
 /*
   Takes in the selected activity element and a jQuery object containing conflicting activities.
   Disables the activities conflicting the selected activity and enables the selected activity
  */
 function disableConflictingEvents(selectedActivity, $conflictingActivities) {
-
   if (!jQuery.isEmptyObject($conflictingActivities)) {
     $conflictingActivities.map(eventIndex => {
       const $activity = $($conflictingActivities[eventIndex]);
@@ -180,7 +175,7 @@ function handlePaymentSelection() {
 
   setDefaultPaymentMethod($paymentOptions, $creditCard, $otherPayments);
 
-  return function (event) {
+  return function(event) {
     paymentSelection = $(event.target).val();
     displaySelectedPaymentMethod(paymentSelection, $creditCard, $otherPayments);
   };
@@ -214,7 +209,8 @@ function displaySelectedPaymentMethod(
 
     hideValidationMessages(
       $("#cc-num, #zip, #cvv"),
-      $("#cc-num-validation, #zip-validation, #cvv-validation")
+      $("#cc-num-validation, #zip-validation, #cvv-validation"),
+      true
     );
 
     $otherPayments.map(index => {
@@ -285,9 +281,15 @@ function initialiseValidations() {
   Initialises the name validation process 
  */
 function initialiseNameValidation() {
-  $("#name").on("click input", event => validateName($(event.target)));
+  $("#name").on("click input", event =>
+    validateNameAndDisplay($(event.target))
+  );
   $("#name").on("focusout", event => {
-    hideValidationMessages($(event.target), $("#name-validation"));
+    hideValidationMessages(
+      $(event.target),
+      $("#name-validation"),
+      validateName($(event.target).val())
+    );
   });
 }
 
@@ -295,9 +297,15 @@ function initialiseNameValidation() {
   Initialises the email validation process 
  */
 function initialiseEmailValidation() {
-  $("#mail").on("input focus", event => validateEmail($(event.target)));
+  $("#mail").on("input focus", event =>
+    validateEmailAndDisplay($(event.target))
+  );
   $("#mail").on("focusout", event => {
-    hideValidationMessages($(event.target), $("#mail-validation"));
+    hideValidationMessages(
+      $(event.target),
+      $("#mail-validation"),
+      validateEmail($(event.target).val())
+    );
   });
 }
 
@@ -306,15 +314,20 @@ function initialiseEmailValidation() {
  */
 function initialiseCardValidation() {
   $("#cc-num, #zip, #cvv").on("input focus", event => {
-    validateCardNumber($("#cc-num"));
-    validateCvvNumber($("#cvv"));
-    validateZipdNumber($("#zip"));
+    validateCardNumberAndDisplay($("#cc-num"));
+    validateCvvNumberAndDisplay($("#cvv"));
+    validateZipNumberAndDisplay($("#zip"));
   });
 
   $("#cc-num, #zip, #cvv").on("focusout", event => {
     hideValidationMessages(
       $("#cc-num, #zip, #cvv"),
-      $("#cc-num-validation, #zip-validation, #cvv-validation")
+      $(
+        "#cc-num-validation, #zip-validation, #cvv-validation",
+        validateCardNumber($("#cc-num").val()) &&
+          validateCvvNumber($("#cvv").val()) &&
+          validateCvvNumber($("#zip").val())
+      )
     );
   });
 }
@@ -324,15 +337,19 @@ function initialiseCardValidation() {
  */
 function initialiseActivityValidation() {
   $(".activities").on("input", "input", event => {
-    validateActivitySelection($(".activities"));
+    validateActivitySelectionAndDisplay($(".activities"));
   });
 
   $(".activities").on("mouseover", event => {
-    validateActivitySelection($(".activities"));
+    validateActivitySelectionAndDisplay($(".activities"));
   });
 
   $(".activities").on("mouseout", event => {
-    hideValidationMessages($(".activities"), $("#activity-validation"));
+    hideValidationMessages(
+      $(".activities"),
+      $("#activity-validation"),
+      validateActivitySelection($(".activities"))
+    );
   });
 }
 
@@ -354,8 +371,8 @@ function createCreditValidationContainerAndHide() {
   Takes in a jQuery object container the name input. Checks if the value is not empty, displays the validation messages
   and returns true if it is valid
  */
-function validateName($nameConatiner) {
-  const validName = $nameConatiner.val().trim() !== "";
+function validateNameAndDisplay($nameConatiner) {
+  const validName = validateName($nameConatiner.val());
   displayValidationResultStyle(
     $nameConatiner,
     $("#name-validation"),
@@ -364,21 +381,38 @@ function validateName($nameConatiner) {
 
   return validName;
 }
+
+/* 
+  Takes in a string name input. Checks if the value is not empty and returns true if it is valid and false if not
+ */
+function validateName(name) {
+  const validName = name.trim() !== "";
+  return validName;
+}
+
 /* 
   Takes in a jQuery object container the email input. Checks if the email is valid, displays the validation messages
-  and returns true if it is valid
+  and returns true if it is valid and false if not
 */
-function validateEmail($emailConatiner) {
-  const emailEntered = $emailConatiner.val();
-  // regex from https://www.w3resource.com/javascript/form/email-validation.php for validating emails
-  const validatorRegex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
-  const validEmail = validatorRegex.test(emailEntered);
+function validateEmailAndDisplay($emailConatiner) {
+  const validEmail = validateEmail($emailConatiner.val());
 
   displayValidationResultStyle(
     $emailConatiner,
     $("#mail-validation"),
     validEmail
   );
+
+  return validEmail;
+}
+
+/* 
+  Takes in an email input string. Checks if the email is valid and returns true if it is valid and false if not
+*/
+function validateEmail(email) {
+  // regex from https://www.w3resource.com/javascript/form/email-validation.php for validating emails
+  const validatorRegex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+  const validEmail = validatorRegex.test(email);
 
   return validEmail;
 }
@@ -412,29 +446,31 @@ function displayValidationResultStyle(
 }
 
 /* 
-  takes in jQuery object of the validation target and the validation message container. Hides
-  the message containers and changes the input borders to original color if it does not have the
+  takes in jQuery object of the validation target, the validation message container, and a boolean indicating
+  if the validation has passed. If validation has passed Hides the message containers and changes the input 
+  borders to original color if it does not have the
   activity class
  */
 function hideValidationMessages(
   $validationTarget,
-  $validationMessageContainer
+  $validationMessageContainer,
+  validationPassed
 ) {
-  $validationMessageContainer.hide();
+  if (validationPassed) {
+    $validationMessageContainer.hide();
 
-  if ($validationTarget.className !== "activities") {
-    $validationTarget.css("border-color", "#5e97b0");
+    if ($validationTarget.className !== "activities") {
+      $validationTarget.css("border-color", "#5e97b0");
+    }
   }
 }
 
 /* 
   Takes in jQuery object of the card number container. Checks if the credit number is valid, displays the validation messages
-  and returns true if it is valid
+  and returns true if it is valid and false if not
  */
-function validateCardNumber($numberContainer) {
-  const numberEntered = $numberContainer.val();
-  const validatorRegex = /^\d{13,16}$/; // regex to check if the number is between 13 and 16 number
-  const validNumber = validatorRegex.test(numberEntered);
+function validateCardNumberAndDisplay($numberContainer) {
+  const validNumber = validateCardNumber($numberContainer.val());
 
   displayValidationResultStyle(
     $numberContainer,
@@ -446,13 +482,21 @@ function validateCardNumber($numberContainer) {
 }
 
 /* 
+  Takes card number styring. Checks if the credit number is valid and returns true if it is valid and false if not
+ */
+function validateCardNumber(number) {
+  const validatorRegex = /^\d{13,16}$/; // regex to check if the number is between 13 and 16 number
+  const validNumber = validatorRegex.test(number);
+
+  return validNumber;
+}
+
+/* 
   Takes in jQuery object of the zip number container. Checks if the zip number is valid, displays the validation messages
   and returns true if it is valid
  */
-function validateZipdNumber($numberContainer) {
-  const numberEntered = $numberContainer.val();
-  const validatorRegex = /^\d{5}$/; // regex to check if number contains exactly 5 digits
-  const validNumber = validatorRegex.test(numberEntered);
+function validateZipNumberAndDisplay($numberContainer) {
+  const validNumber = validateZipNumber($numberContainer.val());
 
   displayValidationResultStyle(
     $numberContainer,
@@ -464,13 +508,22 @@ function validateZipdNumber($numberContainer) {
 }
 
 /* 
-  Takes in jQuery object of the cvv number container. Checks if the zip number is valid, displays the validation messages
+  Takes in jQuery object of the zip number container. Checks if the zip number is valid, displays the validation messages
   and returns true if it is valid
  */
-function validateCvvNumber($numberContainer) {
-  const numberEntered = $numberContainer.val();
-  const validatorRegex = /^\d{3}$/; // regex to check is number contains exactly 3 digits
-  const validNumber = validatorRegex.test(numberEntered);
+function validateZipNumber(number) {
+  const validatorRegex = /^\d{5}$/; // regex to check if number contains exactly 5 digits
+  const validNumber = validatorRegex.test(number);
+
+  return validNumber;
+}
+
+/* 
+  Takes in jQuery object of the cvv number container. Checks if the cvv number is valid, displays the validation messages
+  and returns true if it is valid and false if not
+ */
+function validateCvvNumberAndDisplay($numberContainer) {
+  const validNumber = validateCvvNumber($numberContainer.val());
 
   displayValidationResultStyle(
     $numberContainer,
@@ -482,12 +535,25 @@ function validateCvvNumber($numberContainer) {
 }
 
 /* 
-  Takes in jQuery object of the activity container. Checks if the  number of activity selected is atleast one for validation, displays the validation messages
-  and returns true if it is valid
+  Takes in a cvv number. Checks if cvv number is valid returns true if it is valid and false
+  if not
  */
-function validateActivitySelection($activitiesContainer) {
-  const activitySelectionValid =
-    $activitiesContainer.find("input:checked").length > 0; // checks if atleast one activity is selected
+
+function validateCvvNumber(number) {
+  const validatorRegex = /^\d{3}$/; // regex to check is number contains exactly 3 digits
+  const validNumber = validatorRegex.test(number);
+
+  return validNumber;
+}
+
+/* 
+  Takes in jQuery object of the activity container. Checks if the  number of activity selected is atleast one for validation, displays the validation messages
+  and returns true if it is valid and false if not
+ */
+function validateActivitySelectionAndDisplay($activitiesContainer) {
+  const activitySelectionValid = validateActivitySelection(
+    $activitiesContainer
+  ); // checks if atleast one activity is selected
 
   displayValidationResultStyle(
     $activitiesContainer,
@@ -499,21 +565,32 @@ function validateActivitySelection($activitiesContainer) {
 }
 
 /* 
+  Takes in jQuery object of the activity container. Checks if the  number of activity selected is atleast one for validation
+  and returns true if it is valid and false if not
+ */
+function validateActivitySelection($activitiesContainer) {
+  const activitySelectionValid =
+    $activitiesContainer.find("input:checked").length > 0; // checks if atleast one activity is selected
+
+  return activitySelectionValid;
+}
+
+/* 
   validates name, email, activity selection and credit card (if it is selected) at once and displays 
   the appropriate validation messages 
 */
 
 function validateAll(event) {
-  const validActivity = validateActivitySelection($(".activities"));
-  const validName = validateName($("#name"));
-  const validEmail = validateEmail($("#mail"));
+  const validActivity = validateActivitySelectionAndDisplay($(".activities"));
+  const validName = validateNameAndDisplay($("#name"));
+  const validEmail = validateEmailAndDisplay($("#mail"));
   let validCard = true;
 
   if ($("#payment").val() === "credit card") {
-    const validCardNumber = validateCardNumber($("#cc-num"));
-    const validCardZip = validateZipdNumber($("#zip"));
-    const validCardCvv = validateCvvNumber($("#cvv"));
-    validCard = validCardNumber && validCardCvv && validateZipdNumber;
+    const validCardNumber = validateCardNumberAndDisplay($("#cc-num"));
+    const validCardZip = validateZipNumberAndDisplay($("#zip"));
+    const validCardCvv = validateCvvNumberAndDisplay($("#cvv"));
+    validCard = validCardNumber && validCardCvv && validateZipNumberAndDisplay;
   }
 
   if (!(validActivity && validName && validEmail && validCard)) {
