@@ -52,55 +52,77 @@ function showAndHideOptions($optionsToShow, $optionstoHide) {
   $($optionsToShow["0"]).prop("selected", true);
 }
 /*
-  returns an event handler function to handle the logic of activity selection. Disable conflicting
+  Initialises the total container firs then returns an event handler function 
+  to handle the logic of activity selection. Disable conflicting
   events upon selection and displays the totals as activities are being selected
  */
 function handleActivitySelection() {
-  const $events9To12 = $(
-    "input[name = 'js-frameworks'], input[name = 'express'], input[name = 'build-tools']"
-  );
-  const $events1To4 = $(
-    "input[name = 'js-libs'], input[name = 'node'], input[name = 'npm']"
-  );
   const $totalContainer = initialiseTotalCounter();
-  return function(event) {
-    const $changedEvent = $(event.target);
-    const isChecked = $changedEvent.prop("checked");
-    const $conflictingEvents = $events9To12.is($changedEvent)
-      ? $events9To12
-      : $events1To4;
+  return function (event) {
+    const $changedActivity = $(event.target);
+    const isChecked = $changedActivity.prop("checked");
+    const $conflictingActivities = getConflictingEvents($changedActivity);
 
     if (isChecked) {
-      if ($changedEvent.attr("name") !== "all") {
-        disableConflictingEvents($changedEvent, $conflictingEvents);
+      if ($changedActivity.attr("name") !== "all") {
+        disableConflictingEvents($changedActivity, $conflictingActivities);
         changeTotal(100, $totalContainer);
       } else {
         changeTotal(200, $totalContainer);
       }
     } else {
-      $conflictingEvents.prop("disabled", false);
-      $conflictingEvents.parent().css("color", "#000");
-      $changedEvent.attr("name") === "all"
+
+      if (!jQuery.isEmptyObject($conflictingActivities)) {
+        $conflictingActivities.prop("disabled", false);
+        $conflictingActivities.parent().css("color", "#000");
+      }
+      $changedActivity.attr("name") === "all"
         ? changeTotal(-200, $totalContainer)
         : changeTotal(-100, $totalContainer);
     }
   };
 }
 
+/* 
+  Takes in a jQuery object which contains an activity check box with changed states. Checks if the activity has 
+  other conflicting activities and returns a jQuery Object containing them. If no conflicting activity is found
+  then returns an emty object
+ */
+function getConflictingEvents($changedActivity) {
+  let $conflictingActivities = {};
+  const $events9To12 = $(
+    "input[name = 'js-frameworks'], input[name = 'express']"
+  );
+  const $events1To4 = $(
+    "input[name = 'js-libs'], input[name = 'node']"
+  );
+
+  if ($events9To12.is($changedActivity)) {
+    $conflictingActivities = $events9To12;
+  } else if ($events1To4.is($changedActivity)) {
+    $conflictingActivities = $events1To4;
+  }
+
+  return $conflictingActivities;
+}
+;
 /*
   Takes in the selected activity element and a jQuery object containing conflicting activities.
   Disables the activities conflicting the selected activity and enables the selected activity
  */
 function disableConflictingEvents(selectedActivity, $conflictingActivities) {
-  $conflictingActivities.map(eventIndex => {
-    const $activity = $($conflictingActivities[eventIndex]);
-    if (!$activity.is(selectedActivity)) {
-      $activity.prop("disabled", true);
-      $activity.parent().css({ color: "#A9A9A9" });
-    } else {
-      $activity.prop("disabled", false);
-    }
-  });
+
+  if (!jQuery.isEmptyObject($conflictingActivities)) {
+    $conflictingActivities.map(eventIndex => {
+      const $activity = $($conflictingActivities[eventIndex]);
+      if (!$activity.is(selectedActivity)) {
+        $activity.prop("disabled", true);
+        $activity.parent().css({ color: "#A9A9A9" });
+      } else {
+        $activity.prop("disabled", false);
+      }
+    });
+  }
 }
 
 /* 
@@ -158,7 +180,7 @@ function handlePaymentSelection() {
 
   setDefaultPaymentMethod($paymentOptions, $creditCard, $otherPayments);
 
-  return function(event) {
+  return function (event) {
     paymentSelection = $(event.target).val();
     displaySelectedPaymentMethod(paymentSelection, $creditCard, $otherPayments);
   };
