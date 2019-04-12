@@ -209,7 +209,7 @@ function displaySelectedPaymentMethod(
 
     hideValidationMessages(
       $("#cc-num, #zip, #cvv"),
-      $("#cc-num-validation, #zip-validation, #cvv-validation"),
+      $("#cc-num-validation, #zip-validation, #cvv-validation, #cc-num-validation-pass, #zip-validation-pass, #cvv-validation-pass"),
       true
     );
 
@@ -234,17 +234,20 @@ function initialiseValidationContainers() {
   createValidationContainerAndHide(
     "#name",
     "name-validation",
-    "Name must be filled"
+    "Name must be filled",
+    "Name is filled"
   );
   createValidationContainerAndHide(
     "#mail",
     "mail-validation",
-    "Email must be valid"
+    "Email must be valid",
+    "Email entered is valid"
   );
   createValidationContainerAndHide(
     ".activities",
     "activity-validation",
-    "At least one activity must be selected"
+    "At least one activity must be selected",
+    "Number of activities selected is valid"
   );
   createCreditValidationContainerAndHide();
 }
@@ -257,12 +260,19 @@ function initialiseValidationContainers() {
 function createValidationContainerAndHide(
   targetSelector,
   validationId,
-  message
+  FailMessage,
+  PassMessage
 ) {
   $(targetSelector).after(
-    `<ol><li id = "${validationId}" class = "validation">${message}</li></ol>`
+    `<ol>
+    <li id = "${validationId}" class = "validation">${FailMessage}</li>
+    <li id = "${validationId+'-pass'}" class = "validation">${PassMessage}</li>
+    </ol>`
   );
   $(`#${validationId}`).hide();
+  $(`#${validationId}-pass`).hide();
+  $(`#${validationId}`).css('color',"#F61C1C");
+  $(`#${validationId}-pass`).css('color', "#7FFF00"); 
 }
 
 /* 
@@ -287,7 +297,7 @@ function initialiseNameValidation() {
   $("#name").on("focusout", event => {
     hideValidationMessages(
       $(event.target),
-      $("#name-validation"),
+      $("#name-validation, #name-validation-pass"),
       validateName($(event.target).val())
     );
   });
@@ -303,7 +313,7 @@ function initialiseEmailValidation() {
   $("#mail").on("focusout", event => {
     hideValidationMessages(
       $(event.target),
-      $("#mail-validation"),
+      $("#mail-validation, #mail-validation-pass"),
       validateEmail($(event.target).val())
     );
   });
@@ -323,12 +333,11 @@ function initialiseCardValidation() {
     hideValidationMessages(
       $("#cc-num, #zip, #cvv"),
       $(
-        "#cc-num-validation, #zip-validation, #cvv-validation",
+        "#cc-num-validation, #zip-validation, #cvv-validation, #cc-num-validation-pass, #zip-validation-pass, #cvv-validation-pass"),
         validateCardNumber($("#cc-num").val()) &&
           validateCvvNumber($("#cvv").val()) &&
           validateCvvNumber($("#zip").val())
-      )
-    );
+      );
   });
 }
 
@@ -347,7 +356,7 @@ function initialiseActivityValidation() {
   $(".activities").on("mouseout", event => {
     hideValidationMessages(
       $(".activities"),
-      $("#activity-validation"),
+      $("#activity-validation, #activity-validation-pass"),
       validateActivitySelection($(".activities"))
     );
   });
@@ -362,9 +371,15 @@ function createCreditValidationContainerAndHide() {
             <li id = "cc-num-validation" class = "validation">Credit Card field number between 13 and 16 digits</li>
             <li id = "zip-validation" class = "validation">Zip Code should be  5 digits</li>
             <li id = "cvv-validation" class = "validation">CVV should be 3 digits</li>
+            <li id = "cc-num-validation-pass" class = "validation">Card number is valid</li>
+            <li id = "zip-validation-pass" class = "validation">Zip code is valid</li>
+            <li id = "cvv-validation-pass" class = "validation">Cvv is valid</li>
          </ol>`
   );
   $(`#card-validation li`).hide();
+  $(`#cc-num-validation, #zip-validation, #cvv-validation `).css('color',"#F61C1C");
+  $(`#cc-num-validation-pass, #cvv-validation-pass, #zip-validation-pass`).css('color', "#7FFF00"); 
+  
 }
 
 /* 
@@ -376,6 +391,7 @@ function validateNameAndDisplay($nameConatiner) {
   displayValidationResultStyle(
     $nameConatiner,
     $("#name-validation"),
+    $("#name-validation-pass"),
     validName
   );
 
@@ -400,6 +416,7 @@ function validateEmailAndDisplay($emailConatiner) {
   displayValidationResultStyle(
     $emailConatiner,
     $("#mail-validation"),
+    $("#mail-validation-pass"),
     validEmail
   );
 
@@ -418,27 +435,28 @@ function validateEmail(email) {
 }
 
 /* 
-  Takes in the Jquery object validation target & the validation mesage container, and a boolean
-  indicating if validsation passed. Displays the validation messages and changes the color of messages to red  
-  passed, green if not passed. If the container does not have the activity class then changes the border color to green if passed
+  Takes in the Jquery object validation target & the validation mesage containers, and a boolean
+  indicating if validsation passed. Displays the validation messages. If the container does not have the activity class then changes the border color to green if passed
   and red if not passed
 
   Style visuals inspiration https://ireade.github.io/form-validation-realtime/
  */
 function displayValidationResultStyle(
   $validationTarget,
-  $validationMessageContainer,
+  $validationFailMessageContainer,
+  $validationPassMessageContainer,
   validationPassed
 ) {
-  $validationMessageContainer.show();
 
   if (validationPassed) {
-    $validationMessageContainer.css("color", "#7FFF00");
+    $validationPassMessageContainer.show();
+    $validationFailMessageContainer.hide();
     if ($validationTarget.className !== "activities") {
       $validationTarget.css("border-color", "#2ecc71");
     }
   } else {
-    $validationMessageContainer.css("color", "#F61C1C");
+    $validationFailMessageContainer.show();
+    $validationPassMessageContainer.hide();
     if ($validationTarget.className !== "activities") {
       $validationTarget.css("border-color", "#FD5858");
     }
@@ -446,7 +464,7 @@ function displayValidationResultStyle(
 }
 
 /* 
-  takes in jQuery object of the validation target, the validation message container, and a boolean indicating
+  takes in jQuery object of the validation target, the validation message containers, and a boolean indicating
   if the validation has passed. If validation has passed Hides the message containers and changes the input 
   borders to original color if it does not have the
   activity class
@@ -458,7 +476,6 @@ function hideValidationMessages(
 ) {
   if (validationPassed) {
     $validationMessageContainer.hide();
-
     if ($validationTarget.className !== "activities") {
       $validationTarget.css("border-color", "#5e97b0");
     }
@@ -475,6 +492,7 @@ function validateCardNumberAndDisplay($numberContainer) {
   displayValidationResultStyle(
     $numberContainer,
     $("#cc-num-validation"),
+    $("#cc-num-validation-pass"),
     validNumber
   );
 
@@ -501,6 +519,7 @@ function validateZipNumberAndDisplay($numberContainer) {
   displayValidationResultStyle(
     $numberContainer,
     $("#zip-validation"),
+    $("#zip-validation-pass"),
     validNumber
   );
 
@@ -528,6 +547,7 @@ function validateCvvNumberAndDisplay($numberContainer) {
   displayValidationResultStyle(
     $numberContainer,
     $("#cvv-validation"),
+    $("#cvv-validation-pass"),
     validNumber
   );
 
@@ -558,6 +578,7 @@ function validateActivitySelectionAndDisplay($activitiesContainer) {
   displayValidationResultStyle(
     $activitiesContainer,
     $("#activity-validation"),
+    $("#activity-validation-pass"),
     activitySelectionValid
   );
 
