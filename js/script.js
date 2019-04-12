@@ -85,7 +85,7 @@ function handleActivitySelection() {
 /* 
   Takes in a jQuery object which contains an activity check box with changed states. Checks if the activity has 
   other conflicting activities and returns a jQuery Object containing them. If no conflicting activity is found
-  then returns an emty object
+  then returns an empty object
  */
 function getConflictingEvents($changedActivity) {
   let $conflictingActivities = {};
@@ -326,7 +326,7 @@ function initialiseActivityValidation() {
 }
 
 /* 
-  Creates validation container for the credit card along with the message and hides it
+  Creates validation container for the credit card along with the messages and hides it
  */
 function createCreditValidationContainerAndHide() {
   $("#credit-card").after(
@@ -429,8 +429,7 @@ function displayValidationResultStyle(
 /* 
   takes in jQuery object of the validation target, the validation message containers, and a boolean indicating
   if the validation has passed. If validation has passed Hides the message containers and changes the input 
-  borders to original color if it does not have the
-  activity class
+  borders to original color if it does not have the activity class
  */
 function hideValidationMessages(
   $validationTarget,
@@ -460,7 +459,7 @@ function validateCardNumberAndDisplay($numberContainer) {
 }
 
 /* 
-  Takes card number styring. Checks if the credit number is valid and returns true if it is valid and false if not
+  Takes card number string. Checks if the credit number is valid and returns true if it is valid and false if not
  */
 function validateCardNumber(number) {
   const validatorRegex = /^\d{13,16}$/; // regex to check if the number is between 13 and 16 number
@@ -471,7 +470,7 @@ function validateCardNumber(number) {
 
 /* 
   Takes in jQuery object of the zip number container. Checks if the zip number is valid, displays the validation messages
-  and returns true if it is valid
+  and returns true if it is valid and false if not
  */
 function validateZipNumberAndDisplay($numberContainer) {
   const validNumber = validateZipNumber($numberContainer.val());
@@ -488,7 +487,7 @@ function validateZipNumberAndDisplay($numberContainer) {
 
 /* 
   Takes in jQuery object of the zip number container. Checks if the zip number is valid, displays the validation messages
-  and returns true if it is valid
+  and returns true if it is valid and false if not
  */
 function validateZipNumber(number) {
   const validatorRegex = /^\d{5}$/; // regex to check if number contains exactly 5 digits
